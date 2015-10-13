@@ -53,7 +53,8 @@ int pop(Node **head) {
 
 // Add a new element to the beginning of the list.
 void push(Node **head, int val) {
-    // FILL THIS IN!
+    Node *node1 = make_node(val,*head);
+    *head = node1;
 }
 
 // Remove the first element with the given value; return the number
