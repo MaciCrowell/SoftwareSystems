@@ -34,14 +34,18 @@ void print_list(Node *head) {
 int pop(Node **head) {
     int retval;
     Node *next_node;
+    Node *first;
+
+    
 
     if (*head == NULL) {
         return -1;
     }
 
-    next_node = (*head)->next;
-    retval = (*head)->val;
-    free(*head);
+    first = *head;
+    next_node = (first)->next;
+    retval = (first)->val;
+    free(first);
     *head = next_node;
 
     return retval;
@@ -72,6 +76,8 @@ int main() {
     test_list->next->next->next = make_node(4, NULL);
 
     int retval = pop(&test_list);
+    //print_list(test_list);
+
     push(&test_list, retval+10);
 
     remove_by_value(&test_list, 3);
