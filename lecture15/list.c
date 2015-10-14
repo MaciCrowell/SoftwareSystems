@@ -15,6 +15,8 @@ typedef struct node {
     struct node *next;
 } Node;
 
+Node EmptyNode;
+
 Node *make_node(int val, Node *next) {
     Node *node = malloc(sizeof(Node));
     node->val = val;
@@ -59,14 +61,60 @@ void push(Node **head, int val) {
 
 // Remove the first element with the given value; return the number
 // of nodes removed.
-int remove_by_value(Node **head, int val) {
-    // FILL THIS IN!
+int remove_by_value(Node **head, int sVal) {
+    if (*head == NULL) {
+        return 0;
+    } else if ((*head)->val == sVal) {
+    	**head = *(*head)->next;
+    	return 1;
+    } else {
+    	Node *next_node;
+    	next_node = (*head)->next;
+    	return remove_by_value(&next_node, sVal);
+    }
+}
+
+// Remove the first element with the given value; return the number
+// of nodes removed.
+int remove_by_value2(Node **head, int sVal) {
+	Node *prev = NULL;
+    Node *current = *head;
+    while (current != NULL){
+        if (current->val == sVal){
+        	if (prev == NULL) {
+        		*head = current->next;
+        	} else if (current->next != NULL){
+                prev->next = current->next;
+                prev = current;
+                current = current->next;
+            }
+            else {
+                prev->next = NULL;
+                
+            }
+            return 1;
+        }
+        else {
+            prev = current;
+            current = current->next;
+        }
+    }
     return 0;
 }
 
 // Reverse the elements of the list without allocating new nodes.
 void reverse(Node **head) {
-    // FILL THIS IN!
+    Node *prev = NULL;
+    Node *current = *head;
+    Node *next;
+
+    while (current != NULL){
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    *head = prev;
 }
 
 
@@ -75,14 +123,29 @@ int main() {
     test_list->next = make_node(2, NULL);
     test_list->next->next = make_node(3, NULL);
     test_list->next->next->next = make_node(4, NULL);
+    test_list->next->next->next->next = make_node(5, NULL);
+    test_list->next->next->next->next->next = make_node(6, NULL);
+    test_list->next->next->next->next->next->next = make_node(7, NULL);
+    test_list->next->next->next->next->next->next->next = make_node(8, NULL);
 
     int retval = pop(&test_list);
     //print_list(test_list);
 
     push(&test_list, retval+10);
 
-    remove_by_value(&test_list, 3);
-    remove_by_value(&test_list, 7);
+    //remove_by_value(&test_list, 3);
+
+    int x = remove_by_value2(&test_list, 7);
+    printf("%d\n\n", x);
+    print_list(test_list);
+
+    int y = remove_by_value2(&test_list, 3);
+    printf("\n\n%d\n\n", y);
+    print_list(test_list);
+
+    int z = remove_by_value2(&test_list, 11);
+    printf("\n\n%d\n\n", z);
+
 
     reverse(&test_list);
 
