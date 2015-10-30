@@ -134,7 +134,14 @@ int hash_hashable(Hashable *hashable)
 int equal_int (void *ip, void *jp)
 {
     // FIX ME!
-    return 0;
+    int *ipI = (int *) ip;
+    int *jpI = (int *) jp;
+
+    if (*ipI == *jpI){
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 
@@ -142,7 +149,14 @@ int equal_int (void *ip, void *jp)
 int equal_string (void *s1, void *s2)
 {
     // FIX ME!
-    return 0;
+    char *s1S = (char *) s1;
+    char *s2S = (char *) s2;
+
+    if (strcmp(s1S, s2S) == 0){
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 
@@ -150,7 +164,7 @@ int equal_string (void *s1, void *s2)
 int equal_hashable(Hashable *h1, Hashable *h2)
 {
     // FIX ME!
-    return 0;
+    return h1->equal(h1->key, h2->key);
 }
 
 
@@ -185,12 +199,15 @@ typedef struct node {
     struct node *next;
 } Node;
 
-
+// FIX!
 /* Makes a Node. */
 Node *make_node(Hashable *key, Value *value, Node *next)
 {
-    // FIX ME!
-    return NULL;
+    Node *node = (Node *) malloc (sizeof (Node));
+    node->key = key;
+    node->value = value;
+    node->next = next;
+    return node;
 }
 
 
@@ -202,11 +219,14 @@ void print_node(Node *node)
     printf ("next %p\n", node->next);
 }
 
-
+// FIX!
 /* Prints all the Nodes in a list. */
 void print_list(Node *node)
 {
-    // FIX ME!
+    print_node(node);
+    if (node->next != NULL) {
+        print_list(node->next);
+    }
 }
 
 
@@ -224,6 +244,17 @@ Node *prepend(Hashable *key, Value *value, Node *rest)
 Value *list_lookup(Node *list, Hashable *key)
 {
     // FIX ME!
+    Node *nodeCur = list;
+    Node *nodeNext;
+
+    while(nodeCur != NULL){
+        if (nodeCur->key == key){
+            return nodeCur->value;
+        }
+        nodeNext = nodeCur->next;
+        nodeCur = nodeNext;
+    }
+
     return NULL;
 }
 
@@ -240,7 +271,18 @@ typedef struct map {
 Map *make_map(int n)
 {
     // FIX ME!
-    return NULL;
+    Map *map = (Map *) malloc( sizeof(Map));
+    map->n = n;
+    //Node lists[n];
+    Node **lists = (Node **) malloc( n* sizeof(Node) );
+
+    map->lists = lists;
+
+    int j;
+    for(j = 0; j < n; j++){
+        map->lists[j] = NULL;
+    }
+    return map;
 }
 
 
@@ -262,6 +304,24 @@ void print_map(Map *map)
 void map_add(Map *map, Hashable *key, Value *value)
 {
     // FIX ME!
+    int index = abs(key->hash(key) % map->n);
+
+    Node *newNode = make_node(key, value, NULL);
+
+    if (map->lists[index] == NULL) {
+        map->lists[index] = newNode;
+    } else {
+        Node *nodeCur = map->lists[index];
+        Node *nodeNext;
+
+        while(nodeCur->next != NULL) {
+            nodeNext = nodeCur;
+            nodeCur = nodeNext->next;
+        }
+
+        nodeCur->next = newNode;
+    }
+    return;
 }
 
 
@@ -269,7 +329,13 @@ void map_add(Map *map, Hashable *key, Value *value)
 Value *map_lookup(Map *map, Hashable *key)
 {
     // FIX ME!
-    return NULL;
+    int index = abs(key->hash(key) % map->n);
+
+    if(map->lists[index] == NULL){
+        return NULL;
+    }
+
+    return list_lookup(map->lists[index], key);
 }
 
 
